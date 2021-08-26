@@ -1,6 +1,25 @@
+#!/usr/bin/env python3
+
+import sys
+
+#5
+def no5():
+    string=open(sys.argv[1],'r').readlines()[0].strip()
+    wordlist=string.split (' ')
+    mydict= {i:wordlist.count(i) for i in wordlist}
+    
+    for key, value in mydict.items():
+        print(key + ' ' + str(value))
+        
+if __name__ == "__main__":
+    no5()
+
+
+
+"""
 #1
 
-pinrt (995**2+ 894**2)
+print(995**2+ 894**2)
 
 #2
 
@@ -9,16 +28,22 @@ a=22
 b=27
 c=97
 d=102
-print ([s[a:b+1],s[c:d+1]])
+print([s[a:b+1],s[c:d+1]])
 
 
 #3
 sum=0
-for num in range (4481, 9145):
- if num%2==1:
-  sum=sum+num
+for num in range(4481, 9145):
+    if num%2==1:
+        sum=sum+num
 
 print(sum)
 
 #4
-
+def no4():
+    f=open('rosalind_ini5.txt','r').readlines()
+    i=1
+    while i< len(f):
+        print (f[i])
+        i=i+2
+"""
