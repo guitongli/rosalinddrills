@@ -2,7 +2,30 @@
 
 import sys
 
-#5
+def is_prime(n):
+    pass
+
+
+if __name__ == "__main__":
+    n = int(sys.argv[1])
+    if is_prime(n):
+        print(f"{n} ist prim!")
+    else:
+        print(f"{n} ist nicht prim!")
+
+
+
+"""
+divisible(n, by):
+    return n % by == 0
+
+nums = list(range(n))
+for j in range(ceil(sqrt(n))):
+    nums = filter(lambda x: x % div == 0, nums)
+    
+
+
+
 def no5():
     string=open(sys.argv[1],'r').readlines()[0].strip()
     wordlist=string.split (' ')
@@ -10,13 +33,7 @@ def no5():
     
     for key, value in mydict.items():
         print(key + ' ' + str(value))
-        
-if __name__ == "__main__":
-    no5()
 
-
-
-"""
 #2
 
 s='rNqQtWs3qtj0ScPTEF0wZfGPkAiz4s2NjVJFdBK68gGUOUE3Candoia99p60sJxV43I61TJlCPVYp9rF5yfUo90lQfpIdi9rTejclv53gpVL818yzyLk5fnbyJleTEn6HcPLxnci7jgDxLvwIfKbWcqekPkP3LdnBk8sxgoZussuriensisiOlAFB6r6PHHpBy.'
