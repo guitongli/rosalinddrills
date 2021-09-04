@@ -127,16 +127,84 @@ def hamming_distance(path):
             hamming_count += 1
     return hamming_count
 
+def remove_list(list, a):
+    return list.remove(a)
+
+def enumerating_gene_orders(n):
+    sequence = list(range(n))
+    subset = []
+    rest = sequence[:]
+    for a in sequence:
+        subset.append(a)
+        rest.remove(a)
 
 
+def generate_permutations(sequence: list):
+    permutations = []
+    for element in sequence:
+        permutation = []
+        permutation.append(element)
+        rest = sequence[:]
+        rest.remove(element)
+        permutations.append((permutation, rest))
+    print(permutations)
+
+    pass
+codon_table = '''UUU F      CUU L      AUU I      GUU V
+UUC F      CUC L      AUC I      GUC V
+UUA L      CUA L      AUA I      GUA V
+UUG L      CUG L      AUG M      GUG V
+UCU S      CCU P      ACU T      GCU A
+UCC S      CCC P      ACC T      GCC A
+UCA S      CCA P      ACA T      GCA A
+UCG S      CCG P      ACG T      GCG A
+UAU Y      CAU H      AAU N      GAU D
+UAC Y      CAC H      AAC N      GAC D
+UAA Stop   CAA Q      AAA K      GAA E
+UAG Stop   CAG Q      AAG K      GAG E
+UGU C      CGU R      AGU S      GGU G
+UGC C      CGC R      AGC S      GGC G
+UGA Stop   CGA R      AGA R      GGA G
+UGG W      CGG R      AGG R      GGG G'''
+
+def parse_codon_string(codon_table):
+    codon_dict = {}
+    codon_list = codon_table.replace('\n', ' ').split(' ')
+    for i in range(len(codon_list)):
+        if len(codon_list[i]) == 3:
+            key = codon_list[i]
+            value = codon_list[i+1]
+            codon_dict[key] = value
+    return codon_dict
 
 
+CODON_DICT = {'UUU': 'F', 'CUU': 'L', 'AUU': 'I', 'GUU': 'V', 'UUC': 'F', 'CUC': 'L', 'AUC': 'I', 'GUC': 'V',
+              'UUA': 'L', 'CUA': 'L', 'AUA': 'I', 'GUA': 'V', 'UUG': 'L', 'CUG': 'L', 'AUG': 'M', 'GUG': 'V',
+              'UCU': 'S', 'CCU': 'P', 'ACU': 'T', 'GCU': 'A', 'UCC': 'S', 'CCC': 'P', 'ACC': 'T', 'GCC': 'A',
+              'UCA': 'S', 'CCA': 'P', 'ACA': 'T', 'GCA': 'A', 'UCG': 'S', 'CCG': 'P', 'ACG': 'T', 'GCG': 'A',
+              'UAU': 'Y', 'CAU': 'H', 'AAU': 'N', 'GAU': 'D', 'UAC': 'Y', 'CAC': 'H', 'AAC': 'N', 'GAC': 'D',
+              'UAA': '_', 'CAA': 'Q', 'AAA': 'K', 'GAA': 'E', 'UAG': '_', 'CAG': 'Q', 'AAG': 'K', 'GAG': 'E',
+              'UGU': 'C', 'CGU': 'R', 'AGU': 'S', 'GGU': 'G', 'UGC': 'C', 'CGC': 'R', 'AGC': 'S', 'GGC': 'G',
+              'UGA': '_', 'CGA': 'R', 'AGA': 'R', 'GGA': 'G', 'UGG': 'W', 'CGG': 'R', 'AGG': 'R', 'GGG': 'G'}
 
+def translating_rna_to_protein(path, cut_after_stop_codon=True):
+    with open(path, 'r') as file:
+        rna = ''
+        for line in file:
+            rna += line.strip()
+
+    codons = [rna[n:n+3] for n in range(0, len(rna), 3)]
+    result = ""
+    for codon in codons:
+        result += CODON_DICT[codon]
+    if cut_after_stop_codon:
+        result, _ = result.split('_')
+    return result
 
 
 if __name__ == '__main__':
-    # a= 'GCGACTCGATATCGACTGTATCAAAGCTCACGAGCCTTGGTGCTGTAGTCTACGGCGAGGCTCCTTCCTCCTTTAGGCGACGCTCCTAATTTTGAAATGGTACAAAATCACGCAACCGGCTCACGGCGGTACCAAATTAAGAGGACGAAGACCTGATGAGCAACCACATGTACAGTGCTGTCACGATGCTTAAGTCATCCGAGAAAAGCAACAGGCCCTCCATTCTAAAGGCATTTCGGCAAGGGCCGCGTGTACTCGTTTCGGTCACCGCGTGTCCAAGGCTAAAAGCGTACGGGCACGAAGGTCAATCGCGTGGGGCGTACTCCGCTACGTTGTTCGGACAGAGAAGGCACACATCAGGGTCATGCACCCACGCGGTTCATCTTGTGCATTCGGTTTTCATTTCGTGTCGTGACTGCCGCGATGCGATAATATATTTTCTTATACATTAGAAGTACTGTAATTTGAGTGTCAACAGTAATAAGGATGAGCGACGAGCCGAAGACGATAGACTTAGGAAGGTCTTTTCAATCCTACAACCTTAGGAACTGTATCTTAGGTGCAGGGGCGCCCTTTGGTTTTACCGTCAGAGACATCGCCTAAGTCATTCGTCATGGCCGCGTACGCACGATACTATTTGACCAACCCGTTGACCTTTCCGGTCCTTTGCCTTCACGGCGGTTATACGGGATACAAGTCCCGAATTGGTATGCAACGATGCTAACCACGTGAACTGTGCAAGTACCCAGATGGGTGGTACTTACTGTATACTCCACCTACTCGGTCCGGGTGAGAAGTCAGCTCCCTGCCCATATACAGCCCAGGTTAGCGCGCCCTAGAATGGGCGCGACTCTACATTTCGGGGTTGTGGGTCGGAAACAAAAATGACCTCCGTTACCGGAATAACTCTAAGACCGGAC'
-    gc_contents = gc_content('/Users/testtest/Downloads/rosalind_gc.txt')
-    label, percentage = find_key_of_max_value_in_dict(gc_contents)
+    # gc_contents = gc_content('/Users/testtest/Downloads/rosalind_gc.txt')
+    #label, percentage = find_key_of_max_value_in_dict(gc_contents)
 
-    print(hamming_distance('/Users/testtest/Downloads/rosalind_hamm.txt'))
+    print(translating_rna_to_protein('/Users/testtest/Downloads/rosalind_prot.txt'))
+    #print(translating_rna_to_protein())
