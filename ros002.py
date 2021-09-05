@@ -201,10 +201,75 @@ def translating_rna_to_protein(path, cut_after_stop_codon=True):
         result, _ = result.split('_')
     return result
 
+def mendels_first_law(k, m, n):
+    all_possibilities = (k+m+n)*(k+m+n-1)
+    displaying_possibilities = k*(k-1) + 2*k*m + 2*k*n + m*(m-1)*0.75 + 2*m*n*0.5
+    return displaying_possibilities/all_possibilities
+
+def locating_motif(s, t):
+    positions = ''
+    for i in range(len(s)):
+        if s[(i-1):(i+len(t)-1)] == t:
+           positions += str(i) + ' '
+    return positions
+
+def finding_consensus(path):
+    with open(path, 'r') as file:
+        consensus = ''
+        whole = [line.strip() for line in file]
+        label = ''
+        grouped_dna = ''
+        grouped_dnas = []
+        for element in whole:
+            if element.startswith('>'):
+                if label != '':
+                    grouped_dnas.append(grouped_dna)
+                label = element
+                grouped_dna = ''
+            else:
+                grouped_dna += element
+
+        matrix = [grouped_dnas[i] for i in range(1, len(grouped_dnas), 2)]
+        profile = {
+            'A': [0 for a in range(len(matrix[0]))],
+            'C': [0 for c in range(len(matrix[0]))],
+            'G': [0 for g in range(len(matrix[0]))],
+            'T': [0 for t in range(len(matrix[0]))],
+        }
+        for dna in matrix:
+            for i in range(len(dna)):
+                profile[dna[i]][i] += 1
+        line_a = 'A: '
+        line_c = 'C: '
+        line_g = 'G: '
+        line_t = 'T: '
+        cha_sum = profile['A']
+        for i in range(len(cha_sum)):
+            consensus_cha = max([profile['A'][i], profile['C'][i], profile['G'][i], profile['T'][i]])
+            for char in ['A', 'C', 'G', 'T']:
+                if profile[char][i] == consensus_cha:
+                    consensus += char
+                    break
+        for cha, cha_sum in profile.items():
+            if cha == 'A':
+                for sub_sum in cha_sum:
+                    line_a = line_a + str(sub_sum) + ' '
+            elif cha == 'C':
+                for sub_sum in cha_sum:
+                    line_c = line_c + str(sub_sum) + ' '
+            elif cha == 'G':
+                for sub_sum in cha_sum:
+                    line_g = line_g + str(sub_sum) + ' '
+            elif cha == 'T':
+                for sub_sum in cha_sum:
+                    line_t = line_t + str(sub_sum) + ' '
+
+    return consensus + '\n' + line_a + '\n' + line_c + '\n' + line_g + '\n' + line_t + '\n'
+
 
 if __name__ == '__main__':
     # gc_contents = gc_content('/Users/testtest/Downloads/rosalind_gc.txt')
     #label, percentage = find_key_of_max_value_in_dict(gc_contents)
 
-    print(translating_rna_to_protein('/Users/testtest/Downloads/rosalind_prot.txt'))
-    #print(translating_rna_to_protein())
+    print(finding_consensus('/Users/testtest/Downloads/rosalind_cons.txt'))
+    #print(locating_motif('CTGTAAGATCCCCGACGCACGCCCCGACCCCCCGACTATCCCCCGACAACCCCGACCCCCGACCCCCCCGACCCCCGACTTCCCCGACCCCCCGACTCCCCGACCCCCGACCCCCGACCCCCGACCCCCCGACTCGCCCCGACCCCCGACCCCCGACCTAACCCCGACACCCCGACAATAACCCCGACCCCCGACGCCCCGACCGCCCCCCGACCCTTGACCCCGACCCCCGACCCCCGACCCCCGACCCCCGACTCAGCACCCCGACACAGTGCTCCCCGACCCGTCCCCGACACTAGCAAGCTCCCCGACTAGCCCCGACCCATATTCGACTCCCCGACAACCCCGACCCCCGACCCCCGACCCCCCGACCCCCGACACCCCGAC','CCCCGACCC'))
