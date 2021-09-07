@@ -86,16 +86,16 @@ def mortal_fibonacci_rabbits(n, m):
 
 def parse_fasta(path):
     with open(path, 'r') as file:
-        whole = [line.strip() for line in file]
+        fasta_label_list = [line.strip() for line in file]
 
     grouped_dna = ''
     label = ''
     result = {}
-    for element in whole:
+    for element in fasta_label_list:
         if element.startswith('>'):
             if label != '':
                 result[label] = grouped_dna
-            label = element
+            label = element[1:]
             grouped_dna = ''
         else:
             grouped_dna += element
@@ -103,15 +103,14 @@ def parse_fasta(path):
     return result
 
 
-
-def gc_content(path):
+def gc_content(fasta):
     result = {}
-    fasta = parse_fasta(path)
     for label, dna in fasta.items():
         char_counts = count_chars(dna)
         gc_cont = (char_counts['G'] + char_counts['C']) / len(dna) * 100
         result[label] = gc_cont
     return result
+
 
 def find_key_of_max_value_in_dict(dictionary):
     for key, value in dictionary.items():
@@ -119,15 +118,12 @@ def find_key_of_max_value_in_dict(dictionary):
             return key, value
 
 
-def hamming_distance(path):
-    with open(path, 'r') as file:
-       [str1, str2] = [line.strip() for line in file]
-
-    hamming_count = 0
+def hamming_distance(str1, str2):
+    distance = 0
     for (a, b) in zip(str1, str2):
         if a != b:
-            hamming_count += 1
-    return hamming_count
+            distance += 1
+    return distance
 
 def remove_list(list, a):
     return list.remove(a)
@@ -189,19 +185,14 @@ CODON_DICT = {'UUU': 'F', 'CUU': 'L', 'AUU': 'I', 'GUU': 'V', 'UUC': 'F', 'CUC':
               'UGU': 'C', 'CGU': 'R', 'AGU': 'S', 'GGU': 'G', 'UGC': 'C', 'CGC': 'R', 'AGC': 'S', 'GGC': 'G',
               'UGA': '_', 'CGA': 'R', 'AGA': 'R', 'GGA': 'G', 'UGG': 'W', 'CGG': 'R', 'AGG': 'R', 'GGG': 'G'}
 
-def translating_rna_to_protein(path, cut_after_stop_codon=True):
-    with open(path, 'r') as file:
-        rna = ''
-        for line in file:
-            rna += line.strip()
-
+def translating_rna_to_protein(rna, cut_after_stop_codon=True):
     codons = [rna[n:n+3] for n in range(0, len(rna), 3)]
-    result = ""
+    protein = ""
     for codon in codons:
-        result += CODON_DICT[codon]
+        protein += CODON_DICT[codon]
     if cut_after_stop_codon:
-        result, _ = result.split('_')
-    return result
+        protein, _ = protein.split('_')
+    return protein
 
 def mendels_first_law(k, m, n):
     all_possibilities = (k+m+n)*(k+m+n-1)
@@ -215,8 +206,8 @@ def locating_motif(s, t):
            positions += str(i) + ' '
     return positions
 
-def finding_consensus(path):
-    matrix = [value for key, value in parse_fasta(path).items()]
+def finding_consensus(fasta):
+    matrix = [value for key, value in fasta.items()]
 
     consensus = ''
 
@@ -257,9 +248,41 @@ def finding_consensus(path):
     return consensus + '\n' + line_a + '\n' + line_c + '\n' + line_g + '\n' + line_t + '\n'
 
 
+def has_overlap(s, t, k):
+    # TODO this breaks when k > len(s) or len(t)
+    suffix = s[-k:]
+    prefix = t[:k]
+    return suffix == prefix
+
+
+def get_overlap_graph(fasta_dict, k):
+    nodes = list(fasta_dict.keys())
+    edges = []
+    for label, dna in fasta_dict.items():
+        for other_label, other_dna in [
+            (other_label, other_dna) for other_label, other_dna in fasta_dict.items() if other_label != label
+        ]:
+            if has_overlap(dna, other_dna, k):
+                edges.append((label, other_label))
+    return nodes, edges
+
+
+
+example_fasta_dict = {
+    'Rosalind_0498': 'AAATAAA',
+    'Rosalind_2391': 'AAATTTT',
+    'Rosalind_2323': 'TTTTCCC',
+    'Rosalind_0442': 'AAATCCC'
+}
+
+
 if __name__ == '__main__':
     # gc_contents = gc_content('/Users/testtest/Downloads/rosalind_gc.txt')
     #label, percentage = find_key_of_max_value_in_dict(gc_contents)
+    fasta_dict = parse_fasta('/Users/testtest/Downloads/rosalind_grph (1).txt')
+    nodes, edges = get_overlap_graph(fasta_dict, 3)
 
-    print(finding_consensus('/Users/testtest/Downloads/rosalind_cons.txt'))
+    for fro, to in edges:
+        print(fro, to)
+
     #print(locating_motif('CTGTAAGATCCCCGACGCACGCCCCGACCCCCCGACTATCCCCCGACAACCCCGACCCCCGACCCCCCCGACCCCCGACTTCCCCGACCCCCCGACTCCCCGACCCCCGACCCCCGACCCCCGACCCCCCGACTCGCCCCGACCCCCGACCCCCGACCTAACCCCGACACCCCGACAATAACCCCGACCCCCGACGCCCCGACCGCCCCCCGACCCTTGACCCCGACCCCCGACCCCCGACCCCCGACCCCCGACTCAGCACCCCGACACAGTGCTCCCCGACCCGTCCCCGACACTAGCAAGCTCCCCGACTAGCCCCGACCCATATTCGACTCCCCGACAACCCCGACCCCCGACCCCCGACCCCCCGACCCCCGACACCCCGAC','CCCCGACCC'))
