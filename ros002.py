@@ -275,14 +275,14 @@ example_fasta_dict = {
     'Rosalind_0442': 'AAATCCC'
 }
 
+def calculating_expected_offspring(a, b, c, d, e, f):
+    couple_list = [a, b, c, d, e, f]
+    return couple_list[0]*2 + couple_list[1]*2 + couple_list[2]*2 + couple_list[3]*1.5 + couple_list[4]
+
 
 if __name__ == '__main__':
     # gc_contents = gc_content('/Users/testtest/Downloads/rosalind_gc.txt')
     #label, percentage = find_key_of_max_value_in_dict(gc_contents)
-    fasta_dict = parse_fasta('/Users/testtest/Downloads/rosalind_grph (1).txt')
-    nodes, edges = get_overlap_graph(fasta_dict, 3)
 
-    for fro, to in edges:
-        print(fro, to)
 
-    #print(locating_motif('CTGTAAGATCCCCGACGCACGCCCCGACCCCCCGACTATCCCCCGACAACCCCGACCCCCGACCCCCCCGACCCCCGACTTCCCCGACCCCCCGACTCCCCGACCCCCGACCCCCGACCCCCGACCCCCCGACTCGCCCCGACCCCCGACCCCCGACCTAACCCCGACACCCCGACAATAACCCCGACCCCCGACGCCCCGACCGCCCCCCGACCCTTGACCCCGACCCCCGACCCCCGACCCCCGACCCCCGACTCAGCACCCCGACACAGTGCTCCCCGACCCGTCCCCGACACTAGCAAGCTCCCCGACTAGCCCCGACCCATATTCGACTCCCCGACAACCCCGACCCCCGACCCCCGACCCCCCGACCCCCGACACCCCGAC','CCCCGACCC'))
+    print(calculating_expected_offspring(17904, 17242, 17346, 17234, 19258, 17371))
